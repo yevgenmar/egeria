@@ -36,6 +36,12 @@
         <url>http://www.odpi.org</url>
     </organization>
 
+    <scm>
+        <connection>scm:git:git://github.com/odpi/egeria.git</connection>
+        <developerConnection>scm:git:ssh://github.com:odpi/egeria.git</developerConnection>
+        <url>http://github.com/odpi/egeria/tree/master</url>
+    </scm>
+
     <issueManagement>
         <system>JIRA</system>
         <url>https://jira.odpi.org/browse/EGERIA</url>
