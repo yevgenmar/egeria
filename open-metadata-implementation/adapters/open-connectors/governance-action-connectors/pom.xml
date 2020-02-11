@@ -22,4 +22,12 @@
 
     <artifactId>governance-action-connectors</artifactId>
 
+    <packaging>pom</packaging>
+
+    <scm>
+        <connection>scm:git:git://github.com/odpi/egeria.git</connection>
+        <developerConnection>scm:git:ssh://github.com/odpi/egeria.git</developerConnection>
+        <url>http://github.com/odpi/egeria/tree/master</url>
+    </scm>
+
 </project>
