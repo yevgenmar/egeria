@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.odpi.openmetadata.accessservices.assetlineage.util.AssetLineageConstants.GLOSSARY_TERM;
 import static org.odpi.openmetadata.accessservices.assetlineage.util.AssetLineageConstants.PROCESS;
 import static org.odpi.openmetadata.accessservices.assetlineage.util.AssetLineageConstants.PROCESS_HIERARCHY;
 import static org.odpi.openmetadata.accessservices.assetlineage.util.AssetLineageConstants.SEMANTIC_ASSIGNMENT;
@@ -169,11 +168,13 @@ public class AssetLineageOMRSTopicListener implements OMRSTopicListener {
 
         if (PROCESS.equals(typeDefName)) {
             publisher.publishProcessContext(entityDetail);
-        } else if (GLOSSARY_TERM.equals(typeDefName)) {
+        }
+
+        /*else if (GLOSSARY_TERM.equals(typeDefName)) {
             publisher.publishGlossaryContext(entityDetail);
         } else {
             publisher.publishAssetContext(entityDetail);
-        }
+        }*/
     }
 
     private void processUpdatedEntity(EntityDetail entityDetail, EntityDetail originalEntity) throws OCFCheckedExceptionBase, JsonProcessingException {
