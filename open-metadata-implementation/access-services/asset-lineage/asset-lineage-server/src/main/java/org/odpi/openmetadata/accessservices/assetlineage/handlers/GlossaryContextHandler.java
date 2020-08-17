@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.odpi.openmetadata.accessservices.assetlineage.util.AssetLineageConstants.GLOSSARY_TERM;
 import static org.odpi.openmetadata.accessservices.assetlineage.util.AssetLineageConstants.GUID_PARAMETER;
 import static org.odpi.openmetadata.accessservices.assetlineage.util.AssetLineageConstants.SEMANTIC_ASSIGNMENT;
 
@@ -47,6 +48,10 @@ public class GlossaryContextHandler {
         this.repositoryHandler = repositoryHandler;
         this.handlerHelper = new HandlerHelper(invalidParameterHandler, repositoryHelper, repositoryHandler, lineageClassificationTypes);
         this.assetContextHandler = assetContextHandler;
+    }
+
+    public EntityDetail getGlossaryTermDetails(String userId, String glossaryTermGUID) throws OCFCheckedExceptionBase {
+        return handlerHelper.getEntityDetails(userId, glossaryTermGUID, GLOSSARY_TERM);
     }
 
     public Map<String, Set<GraphContext>> buildGlossaryTermContext(String userId,

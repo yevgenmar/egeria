@@ -10,19 +10,16 @@ import org.odpi.openmetadata.accessservices.assetlineage.event.AssetLineageEvent
 import org.odpi.openmetadata.accessservices.assetlineage.event.AssetLineageEventType;
 import org.odpi.openmetadata.accessservices.assetlineage.event.LineageEvent;
 import org.odpi.openmetadata.accessservices.assetlineage.event.LineageRelationshipEvent;
-import org.odpi.openmetadata.accessservices.assetlineage.handlers.AssetContextHandler;
 import org.odpi.openmetadata.accessservices.assetlineage.handlers.ClassificationHandler;
 import org.odpi.openmetadata.accessservices.assetlineage.handlers.GlossaryContextHandler;
 import org.odpi.openmetadata.accessservices.assetlineage.handlers.ProcessContextHandler;
 import org.odpi.openmetadata.accessservices.assetlineage.model.GraphContext;
 import org.odpi.openmetadata.accessservices.assetlineage.model.LineageRelationship;
 import org.odpi.openmetadata.accessservices.assetlineage.server.AssetLineageInstanceHandler;
-import org.odpi.openmetadata.accessservices.assetlineage.util.SuperTypesRetriever;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.ConnectorCheckedException;
 import org.odpi.openmetadata.frameworks.connectors.ffdc.OCFCheckedExceptionBase;
 import org.odpi.openmetadata.repositoryservices.connectors.openmetadatatopic.OpenMetadataTopicConnector;
 import org.odpi.openmetadata.repositoryservices.connectors.stores.metadatacollectionstore.properties.instances.EntityDetail;
-import org.odpi.openmetadata.repositoryservices.connectors.stores.metadatacollectionstore.repositoryconnector.OMRSRepositoryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,31 +36,26 @@ public class AssetLineagePublisher {
     private static AssetLineageInstanceHandler instanceHandler = new AssetLineageInstanceHandler();
     private OpenMetadataTopicConnector outTopicConnector;
     private String serverUserName;
-    private SuperTypesRetriever superTypesRetriever;
     private ProcessContextHandler processContextHandler;
     private ClassificationHandler classificationHandler;
-    private AssetContextHandler assetContextHandler;
     private GlossaryContextHandler glossaryHandler;
 
     /**
      * The constructor is given the connection to the out topic for Asset Lineage OMAS
      * along with classes for testing and manipulating instances.
      *
-     * @param repositoryHelper  provides utilities for manipulating the repository services objects
      * @param outTopicConnector connection to the out topic
      * @param serverName        name of the user of the server instance
      * @param serverUserName    name of this server instance
      */
-    public AssetLineagePublisher(OMRSRepositoryHelper repositoryHelper, OpenMetadataTopicConnector outTopicConnector,
+    public AssetLineagePublisher(OpenMetadataTopicConnector outTopicConnector,
                                  String serverName, String serverUserName)
             throws OCFCheckedExceptionBase {
         String methodName = "AssetLineagePublisher";
         this.outTopicConnector = outTopicConnector;
         this.serverUserName = serverUserName;
-        this.superTypesRetriever = new SuperTypesRetriever(repositoryHelper);
         this.processContextHandler = instanceHandler.getProcessHandler(serverUserName, serverName, methodName);
         this.classificationHandler = instanceHandler.getClassificationHandler(serverUserName, serverName, methodName);
-        this.assetContextHandler = instanceHandler.getAssetContextHandler(serverUserName, serverName, methodName);
         this.glossaryHandler = instanceHandler.getGlossaryHandler(serverUserName, serverName, methodName);
     }
 
@@ -83,11 +75,16 @@ public class AssetLineagePublisher {
         publishLineageEvent(processContext, AssetLineageEventType.PROCESS_CONTEXT_EVENT);
     }
 
+    public void publishGlossaryContext(String glossaryTermGUID) throws OCFCheckedExceptionBase, JsonProcessingException {
+       EntityDetail entityDetail =  glossaryHandler.getGlossaryTermDetails(serverUserName, glossaryTermGUID);
+       publishGlossaryContext(entityDetail);
+    }
+
     public void publishGlossaryContext(EntityDetail entityDetail) throws OCFCheckedExceptionBase, JsonProcessingException {
         Map<String, Set<GraphContext>> context = glossaryHandler.buildGlossaryTermContext(serverUserName, entityDetail);
 
         if (MapUtils.isEmpty(context)) {
-            log.debug("No context were found for the entity {} ", glossaryTerm.getGUID());
+            log.debug("No context were found for the entity {} ", entityDetail.getGUID());
             return;
         }
 
