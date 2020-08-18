@@ -23,6 +23,7 @@ import org.odpi.openmetadata.repositoryservices.connectors.stores.metadatacollec
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,15 +65,16 @@ public class AssetLineagePublisher {
      *
      * @param entityDetail entity to get context
      */
-    public void publishProcessContext(EntityDetail entityDetail) throws OCFCheckedExceptionBase, JsonProcessingException {
+    public Map<String, Set<GraphContext>> publishProcessContext(EntityDetail entityDetail) throws OCFCheckedExceptionBase, JsonProcessingException {
         Map<String, Set<GraphContext>> processContext = processContextHandler.getProcessContext(serverUserName, entityDetail);
 
         if (MapUtils.isEmpty(processContext)) {
             log.debug("No context was found for the entity {} ", entityDetail.getGUID());
-            return;
+            return Collections.emptyMap();
         }
 
         publishLineageEvent(processContext, AssetLineageEventType.PROCESS_CONTEXT_EVENT);
+        return processContext;
     }
 
     public void publishGlossaryContext(String glossaryTermGUID) throws OCFCheckedExceptionBase, JsonProcessingException {
@@ -80,15 +82,16 @@ public class AssetLineagePublisher {
        publishGlossaryContext(entityDetail);
     }
 
-    public void publishGlossaryContext(EntityDetail entityDetail) throws OCFCheckedExceptionBase, JsonProcessingException {
+    public  Map<String, Set<GraphContext>> publishGlossaryContext(EntityDetail entityDetail) throws OCFCheckedExceptionBase, JsonProcessingException {
         Map<String, Set<GraphContext>> context = glossaryHandler.buildGlossaryTermContext(serverUserName, entityDetail);
 
         if (MapUtils.isEmpty(context)) {
             log.debug("No context were found for the entity {} ", entityDetail.getGUID());
-            return;
+            return Collections.emptyMap();
         }
 
         publishLineageEvent(context, AssetLineageEventType.GLOSSARY_TERM_CONTEXT_EVENT);
+        return context;
     }
 
     public void publishClassificationContext(EntityDetail entityDetail, AssetLineageEventType assetLineageEventType)
